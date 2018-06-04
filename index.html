@@ -21,7 +21,7 @@
 
        <div>
          <ul id="list-of-restaurants" data-bind="foreach: placeList">
-           <li data-bind="text: name, click: $parent.setPlace">
+           <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace">
          </ul>
        </div>
      </div>

@@ -32,7 +32,10 @@ var ViewModel = function() {
     // var markerID = clickedPlace['id'];
     // console.log(clickedPlace.placeId());
     google.maps.event.trigger(markers[clickedPlace.placeId()], 'click');
-    // initMap.marker.click();
+    // google.maps.event.trigger(restaurantName, 'click');
+    map.setCenter(clickedPlace.location());
+    map.setZoom(15);
+    // focusRestaurant('Aunt Butchies');
   };
 }
 
