@@ -4,16 +4,18 @@ var Restaurant = function(data) {
   this.rating = ko.observable(data.rating);
   this.placeId = ko.observable(data.id);
   // this.imgSrc = ko.observable(data.name);
+  this.yelpID = ko.observable(data.yelpID);
 }
 
 
 var myRestaurants = [
   {
-    name: "Aunt Butchie's of Brooklyn", location: {lat: 40.523841, lng: -74.238527}, rating: 5, id: 0
+    name: "Aunt Butchie's of Brooklyn", location: {lat: 40.523841, lng: -74.238527}, rating: 5, id: 0, yelpID: "HBcmdviQgkWO4bqgxAjtNw"
   }, {
-    name: "Campania Coal Fired Pizzeria", location: {lat: 40.543107, lng: -74.163835}, rating: 4, id: 1
+    name: "Campania Coal Fired Pizzeria", location: {lat: 40.543107, lng: -74.163835}, rating: 4, id: 1, yelpID: "JIhIWha-3zOBKyoOzGq0TA"
+  }, {
+    name: "Capizzi", location: {lat: 40.538925, lng: -74.148333}, rating: 4, id:2, yelpID: "mSFyMRKDLF8DOwOEhV35ow"
   }
-
 ];
 
 var ViewModel = function() {
@@ -27,20 +29,46 @@ var ViewModel = function() {
 
   // this.currentPlace = ko.observable( this.placeList()[0] );
 
+  // When list item is clicked, update map
   this.setPlace = function(clickedPlace) {
-    // self.currentPlace(clickedPlace);
-    // var markerID = clickedPlace['id'];
-    // console.log(clickedPlace.placeId());
-    google.maps.event.trigger(markers[clickedPlace.placeId()], 'click');
-    // google.maps.event.trigger(restaurantName, 'click');
+    // Retrieve the place ID from the DOM element
+    var markerID = clickedPlace.placeId();
+    // Trigger click event on Marker for this list item
+    google.maps.event.trigger(markers[markerID], 'click');
+    // Center map and zoom over restaurant marker
     map.setCenter(clickedPlace.location());
     map.setZoom(15);
-    // focusRestaurant('Aunt Butchies');
+    // If markers are hidden, make visible for clicked restaurant
+    if (markers[markerID].map != map) {
+      markers[markerID].setMap(map);
+      markers[markerID].setAnimation(google.maps.Animation.DROP);
+    }
+    var yelpID = clickedPlace.yelpID();
+    getYelpData(yelpID);
   };
 }
 
 
 
+function getYelpData(yelpID) {
+  var settings = {
+    "async": true,
+    "crossDomain": true,
+    // Pass in the Yelp business ID for the clicked restaurant
+    "url": "https://api.yelp.com/v3/businesses/" + yelpID,
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
+      "Cache-Control": "no-cache",
+      "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
+    },
+    "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
+  }
+
+  $.ajax(settings).done(function (response) {
+    var responseData = response;
+  });
+}
 // ----------------------------------------------------------
 // Google Maps API
 var map;
@@ -266,6 +294,14 @@ function initMap() {
   document.getElementById('show-restaurants').addEventListener('click', showRestaurants);
   document.getElementById('hide-restaurants').addEventListener('click', hideRestaurants);
 
+  // Allow Enter key to submit text entry.
+  document.getElementById('zoom-to-area-text').addEventListener('keypress', function (e) {
+    var key = e.which || e.keyCode;
+    if (key === 13) { // 13 is Enter key
+      zoomToArea();
+    }
+  });
+
   document.getElementById('zoom-to-area').addEventListener('click', function() {
     zoomToArea();
   });
@@ -277,7 +313,7 @@ function initMap() {
       infoWindow.open(map, marker);
       // Make sure the marker property is cleared if the infowindow is closed
       infoWindow.addListener('closeclick', function() {
-        infoWindow.setMarker(null);
+        infoWindow.setMarker = null;
       });
 
     };
@@ -289,7 +325,10 @@ function initMap() {
     var bounds = new google.maps.LatLngBounds();
     // Extend the bounds of the map to include any new markers
     for (var i=0; i < markers.length; i++) {
-      markers[i].setMap(map);
+      if (markers[i].map != map) {
+        markers[i].setMap(map);
+        markers[i].setAnimation(google.maps.Animation.DROP);
+      }
       bounds.extend(markers[i].position);
     }
     map.fitBounds(bounds);
@@ -317,7 +356,7 @@ function initMap() {
       // Geocode the address/area entered to get the center. Then center the map on it and zoom in.
       geocoder.geocode(
         { address:address,
-          componentRestrictions: {locality: 'Staten Island, New York'}
+          componentRestrictions: {locality: 'Staten Island'}
         }, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
             map.setCenter(results[0].geometry.location);
