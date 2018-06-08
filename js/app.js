@@ -5,6 +5,8 @@ var Restaurant = function(data) {
   this.placeId = ko.observable(data.id);
   // this.imgSrc = ko.observable(data.name);
   this.yelpID = ko.observable(data.yelpID);
+
+
 }
 
 
@@ -18,6 +20,17 @@ var myRestaurants = [
   }
 ];
 
+// ko.components.register('yelp-widget', {
+//   viewModel: function(params) {
+//     console.log("yelpID: " + yelpID.value);
+//     getYelpData(yelpID.value);
+//
+//     console.log(YelpInfo.yelpName);
+//
+//   },
+//   template: '<div class="yelp-tray" data-bind="visible: YelpInfo.yelpName">\ </div>'
+// });
+
 var ViewModel = function() {
   var self = this;
 
@@ -27,14 +40,29 @@ var ViewModel = function() {
     self.placeList.push( new Restaurant(placeItem) );
   });
 
-  // this.currentPlace = ko.observable( this.placeList()[0] );
+  this.currentPlace = ko.observable( this.placeList()[0] );
+
+  var yelpID = this.placeList()[0].yelpID;
+  console.log(yelpID());
+
+  // Load Yelp data for bottom tray
+  getYelpData(yelpID);
 
   // When list item is clicked, update map
   this.setPlace = function(clickedPlace) {
+    self.currentPlace(clickedPlace);
+// Maybe separate the below into function
+
     // Retrieve the place ID from the DOM element
     var markerID = clickedPlace.placeId();
     // Trigger click event on Marker for this list item
     google.maps.event.trigger(markers[markerID], 'click');
+
+    // Hide all markers on map
+    for (var i=0; i < markers.length; i++) {
+      markers[i].setMap(null);
+    }
+
     // Center map and zoom over restaurant marker
     map.setCenter(clickedPlace.location());
     map.setZoom(15);
@@ -43,13 +71,35 @@ var ViewModel = function() {
       markers[markerID].setMap(map);
       markers[markerID].setAnimation(google.maps.Animation.DROP);
     }
-    var yelpID = clickedPlace.yelpID();
-    getYelpData(yelpID);
+    // var yelpID = ;
+    // Load Yelp data for bottom tray
+    getYelpData("mSFyMRKDLF8DOwOEhV35ow");
   };
 }
 
+// function displayYelpTray(yelpData) {
+//     console.log(yelpData);
+//     this.yelpName = ko.observable(yelpData.name);
+// }
+
+var YelpInfo = function(data) {
+  // console.log(data);
+  this.yelpName = ko.observable(data.name);
+  this.rating = ko.observable(data.rating);
+  this.address = ko.observable(data.location.address1);
+  this.phone = ko.observable(data.phone);
+  // this.hours = ko.observableArray([]);
+  this.imgSrc = ko.observable(data.image_url);
+  console.log(this.yelpName());
+  console.log(this.rating());
+  console.log(this.address());
+  console.log(this.phone());
+  // console.log(this.hours());
+  console.log(this.imgSrc());
+}
 
 
+// Access Yelp API
 function getYelpData(yelpID) {
   var settings = {
     "async": true,
@@ -65,10 +115,19 @@ function getYelpData(yelpID) {
     "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
   }
 
+  console.log(settings.url);
+
   $.ajax(settings).done(function (response) {
-    var responseData = response;
+    console.log(response);
+
+    YelpInfo(response);
+
+    // return response;
+    // console.log("ERROR - Restaurant Not Found")
+
   });
 }
+
 // ----------------------------------------------------------
 // Google Maps API
 var map;
