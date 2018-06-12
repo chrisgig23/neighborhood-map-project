@@ -13,7 +13,7 @@
          <input id="show-restaurants" type="button" value="Show Restaurants">
          <input id="hide-restaurants" type="button" value="Hide Restaurants">
        </div>
-
+       <hr>
        <div>
          <input id="zoom-to-area-text" type="text" placeholder="Enter the area you'd like to search">
          <input id="zoom-to-area" type="button" value="Zoom">
@@ -21,7 +21,7 @@
 
        <div>
          <ul id="list-of-restaurants" data-bind="foreach: placeList">
-           <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace">
+           <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace, event: { mouseover: $parent.highlightMarker }">
          </ul>
        </div>
      </div>

@@ -43,10 +43,20 @@ var ViewModel = function() {
   this.currentPlace = ko.observable( this.placeList()[0] );
 
   var yelpID = this.placeList()[0].yelpID;
-  console.log(yelpID());
+  // console.log(yelpID());
 
   // Load Yelp data for bottom tray
-  getYelpData(yelpID);
+  // getYelpData(yelpID);
+
+  this.highlightMarker = function(clickedPlace) {
+    var markerID = clickedPlace.placeId();
+    // markers[markerID].makeMarkerIcon('2465c9');
+  };
+
+  this.defaultMarker = function(clickedPlace) {
+    var markerID = clickedPlace.placeId();
+    // markers[markerID].makeMarkerIcon('93a7c6');
+  }
 
   // When list item is clicked, update map
   this.setPlace = function(clickedPlace) {
@@ -73,7 +83,7 @@ var ViewModel = function() {
     }
     // var yelpID = ;
     // Load Yelp data for bottom tray
-    getYelpData("mSFyMRKDLF8DOwOEhV35ow");
+    getYelpData(clickedPlace.yelpID());
   };
 }
 
@@ -331,6 +341,20 @@ function initMap() {
   var largeInfoWindow = new google.maps.InfoWindow();
   // Bounds of the map
 
+  var defaultIcon = makeMarkerIcon('93a7c6');
+
+  var highlightedIcon = makeMarkerIcon('2465c9');
+
+  function makeMarkerIcon(markerColor) {
+      var markerImage = new google.maps.MarkerImage('http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor + '|40|_|%E2%80%A2',
+      new google.maps.Size(21,34),
+      new google.maps.Point(0,0),
+      new google.maps.Point(10,34),
+      new google.maps.Size(21,34),
+      );
+      return markerImage;
+  }
+
   for (var i=0; i<myRestaurants.length; i++) {
     // Get the position from locations array
     var position = myRestaurants[i].location;
@@ -339,6 +363,7 @@ function initMap() {
       // map:map,
       position:position,
       title:title,
+      icon: defaultIcon,
       animation: google.maps.Animation.DROP,
       id: i
     });
@@ -348,7 +373,14 @@ function initMap() {
     marker.addListener('click', function() {
       populateInfoWindow(this, largeInfoWindow);
     });
+    marker.addListener('mouseover', function() {
+      this.setIcon(highlightedIcon);
+    });
+    marker.addListener('mouseout', function() {
+      this.setIcon(defaultIcon);
+    });
   }
+
 
   document.getElementById('show-restaurants').addEventListener('click', showRestaurants);
   document.getElementById('hide-restaurants').addEventListener('click', hideRestaurants);
@@ -415,11 +447,13 @@ function initMap() {
       // Geocode the address/area entered to get the center. Then center the map on it and zoom in.
       geocoder.geocode(
         { address:address,
-          componentRestrictions: {locality: 'Staten Island'}
+          componentRestrictions: {locality: 'New York'}
         }, function(results, status) {
           if (status == google.maps.GeocoderStatus.OK) {
             map.setCenter(results[0].geometry.location);
             map.setZoom(15);
+            hideRestaurants();
+            searchWithinBounds();
           } else {
             window.alert('We could not find that location - try entering a more specific place.');
           }
@@ -428,8 +462,21 @@ function initMap() {
     }
   }
 
+  // When an area is searched, any markers located within the bounds of the map will be displayed.
+  function searchWithinBounds() {
+    // Loop through markers array, and save the location of the markers position
+    for (var i = 0; i<markers.length; i++) {
+      var point = new google.maps.LatLng(parseFloat(markers[i].position.lat()), parseFloat(markers[i].position.lng()));
+      var myBounds = map.getBounds();
 
-
+      // Check if markers position falls within current bounds of the map, and display marker if yes.
+      if (myBounds.contains(point)) {
+        markers[i].setMap(map);
+      } else {
+        markers[i].setMap(null);
+      }
+    }
+  }
 }
 
 ko.applyBindings(new ViewModel(map));
