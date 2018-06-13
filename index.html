@@ -20,6 +20,16 @@
        </div>
 
        <div>
+         <p>
+           Filter by Cuisine:
+           <select id="cuisine-type" data-bind="options: placeList,
+           optionsText: 'cuisine',
+           optionsCaption: 'Choose Cuisine'"></select>
+           <!-- value: selectedCuisine, -->
+         </p>
+       </div>
+
+       <div>
          <ul id="list-of-restaurants" data-bind="foreach: placeList">
            <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace, event: { mouseover: $parent.highlightMarker }">
          </ul>

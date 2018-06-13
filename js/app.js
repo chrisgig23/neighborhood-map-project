@@ -1,7 +1,7 @@
 var Restaurant = function(data) {
   this.name = ko.observable(data.name);
   this.location = ko.observable(data.location);
-  this.rating = ko.observable(data.rating);
+  this.cuisine = ko.observable(data.cuisine);
   this.placeId = ko.observable(data.id);
   // this.imgSrc = ko.observable(data.name);
   this.yelpID = ko.observable(data.yelpID);
@@ -12,11 +12,15 @@ var Restaurant = function(data) {
 
 var myRestaurants = [
   {
-    name: "Aunt Butchie's of Brooklyn", location: {lat: 40.523841, lng: -74.238527}, rating: 5, id: 0, yelpID: "HBcmdviQgkWO4bqgxAjtNw"
+    name: "Aunt Butchie's of Brooklyn", location: {lat: 40.523841, lng: -74.238527}, cuisine: 'Italian', id: 0, yelpID: "HBcmdviQgkWO4bqgxAjtNw"
   }, {
-    name: "Campania Coal Fired Pizzeria", location: {lat: 40.543107, lng: -74.163835}, rating: 4, id: 1, yelpID: "JIhIWha-3zOBKyoOzGq0TA"
+    name: "Campania Coal Fired Pizzeria", location: {lat: 40.543107, lng: -74.163835}, cuisine: 'Pizza', id: 1, yelpID: "JIhIWha-3zOBKyoOzGq0TA"
   }, {
-    name: "Capizzi", location: {lat: 40.538925, lng: -74.148333}, rating: 4, id:2, yelpID: "mSFyMRKDLF8DOwOEhV35ow"
+    name: "Capizzi", location: {lat: 40.538925, lng: -74.148333}, cuisine: 'Italian', id:2, yelpID: "mSFyMRKDLF8DOwOEhV35ow"
+  }, {
+    name: "Genki Sushi", location: {lat: 40.55278344473, lng: -74.193325368046}, cuisine: 'Sushi', id:3, yelpID: "6xFL5H9cVU2sAmEHZVI0gw"
+  }, {
+    name: "Project Brunch", location: {lat: 40.6298312, lng: -74.1096512}, cuisine: 'Brunch', id:4, yelpID: "ZNAOPaNS6U3h_LgRF7Eu_A"
   }
 ];
 
@@ -53,6 +57,8 @@ var ViewModel = function() {
     // markers[markerID].makeMarkerIcon('2465c9');
   };
 
+  // this.selectedCuisine = ko.observable();
+  // console.log(selectedCuisine);
   this.defaultMarker = function(clickedPlace) {
     var markerID = clickedPlace.placeId();
     // markers[markerID].makeMarkerIcon('93a7c6');
@@ -325,19 +331,6 @@ function initMap() {
     mapTypeControl: false
   });
 
-  // These are a list of my favorite restaurants
-  // var locations = [
-  //     {
-  //     //   title: "Aunt Butchie's of Brooklyn", location: {lat: , lng: }
-  //     // }, {
-  //       title: "Campania Coal Fired Pizzeria", location: {lat: 40.585578, lng: -74.162485}
-  //     }, {
-  //       title: 'Home', location: {lat: 40.585578, lng: -74.162485}
-  //     }, {
-  //       title: 'Home', location: {lat: 40.585578, lng: -74.162485}
-  //     },
-  // ];
-
   var largeInfoWindow = new google.maps.InfoWindow();
   // Bounds of the map
 
@@ -367,6 +360,7 @@ function initMap() {
       animation: google.maps.Animation.DROP,
       id: i
     });
+
     // Push the marker to array of markers
     markers.push(marker);
     // Creates an onclick event to show the infoWindow for each marker.
@@ -380,7 +374,7 @@ function initMap() {
       this.setIcon(defaultIcon);
     });
   }
-
+  showRestaurants(); // Display markers by default
 
   document.getElementById('show-restaurants').addEventListener('click', showRestaurants);
   document.getElementById('hide-restaurants').addEventListener('click', hideRestaurants);
