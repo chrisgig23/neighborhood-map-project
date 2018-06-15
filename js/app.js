@@ -151,34 +151,6 @@ var YelpInfo = function(data) {
 }
 
 
-// Access Yelp API
-function getYelpData(yelpID) {
-  var settings = {
-    "async": true,
-    "crossDomain": true,
-    // Pass in the Yelp business ID for the clicked restaurant
-    "url": "https://api.yelp.com/v3/businesses/" + yelpID,
-    "method": "GET",
-    "headers": {
-      "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
-      "Cache-Control": "no-cache",
-      "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
-    },
-    "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
-  }
-
-  console.log(settings.url);
-
-  $.ajax(settings).done(function (response) {
-    console.log(response);
-
-    YelpInfo(response);
-
-    // return response;
-    // console.log("ERROR - Restaurant Not Found")
-
-  });
-}
 
 function filterMap(list) {
   // for (var i=0; i<list.length; i++) {
@@ -299,6 +271,35 @@ function populateInfoWindow(marker, infoWindow) {
     });
 
   };
+}
+
+// Access Yelp API
+function getYelpData(yelpID) {
+  var settings = {
+    "async": true,
+    "crossDomain": true,
+    // Pass in the Yelp business ID for the clicked restaurant
+    "url": "https://api.yelp.com/v3/businesses/" + yelpID,
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
+      "Cache-Control": "no-cache",
+      "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
+    },
+    "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
+  }
+
+  console.log(settings.url);
+
+  $.ajax(settings).done(function (response) {
+    console.log(response);
+
+    YelpInfo(response);
+
+    // return response;
+    // console.log("ERROR - Restaurant Not Found")
+
+  });
 }
 
 function initMap() {
