@@ -122,6 +122,7 @@ var ViewModel = function() {
     };
 
     if (map) {
+      console.log(self.filteredList()[0].placeId() );
       filterMap(self.filteredList());
     }
 
@@ -182,6 +183,8 @@ function getYelpData(yelpID) {
 function filterMap(list) {
   // for (var i=0; i<list.length; i++) {
   //   console.log("Name:"+ list[i].name() );
+  //   console.log(list[i].location() );
+  //   console.log(list[i].placeId() )
   // }
 
   var bounds = new google.maps.LatLngBounds();
@@ -191,10 +194,11 @@ function filterMap(list) {
 
   // Extend the bounds of the map to include any new markers
   for (var i=0; i < list.length; i++) {
-    markers[i].setMap(map);
-    markers[i].setAnimation(google.maps.Animation.DROP);
-    bounds.extend(markers[i].position);
+    markers[ list[i].placeId() ].setMap(map);
+    markers[list[i].placeId()].setAnimation(google.maps.Animation.DROP);
+    bounds.extend(markers[list[i].placeId()].position);
   }
+
   map.fitBounds(bounds);
 }
 
@@ -375,7 +379,8 @@ function initMap() {
     center: {lat: 40.586074, lng: -74.156711},
     zoom: 13,
     styles: styles,
-    mapTypeControl: false
+    mapTypeControl: false,
+    maxZoom: 15
   });
 
   var largeInfoWindow = new google.maps.InfoWindow();
