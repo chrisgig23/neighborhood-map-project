@@ -39,10 +39,28 @@ var ViewModel = function() {
   var self = this;
 
   this.placeList = ko.observableArray([]);
+  this.availableCuisines = ko.observableArray([]);
+  this.selectedCuisine = ko.observable();
 
   myRestaurants.forEach(function(placeItem){
     self.placeList.push( new Restaurant(placeItem) );
+
+    // If restaurant's cuisine is not already in cuisine list, add it for filtering
+    if (self.availableCuisines.indexOf(placeItem.cuisine) == -1) {
+      self.availableCuisines.push( placeItem.cuisine );
+    };
   });
+
+  self.filterBy = ko.computed(function() {
+    var cuisine = self.selectedCuisine();
+
+    if (!cuisine) {
+      console.log("ALL");
+    } else {
+      console.log(cuisine);
+    };
+  });
+  // console.log(this.availableCuisines());
 
   this.currentPlace = ko.observable( this.placeList()[0] );
 
@@ -57,8 +75,6 @@ var ViewModel = function() {
     // markers[markerID].makeMarkerIcon('2465c9');
   };
 
-  // this.selectedCuisine = ko.observable();
-  // console.log(selectedCuisine);
   this.defaultMarker = function(clickedPlace) {
     var markerID = clickedPlace.placeId();
     // markers[markerID].makeMarkerIcon('93a7c6');

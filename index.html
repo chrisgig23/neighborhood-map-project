@@ -22,11 +22,14 @@
        <div>
          <p>
            Filter by Cuisine:
-           <select id="cuisine-type" data-bind="options: placeList,
-           optionsText: 'cuisine',
-           optionsCaption: 'Choose Cuisine'"></select>
-           <!-- value: selectedCuisine, -->
+           <select id="cuisine-type" data-bind="options: availableCuisines,
+           optionsCaption: 'Show All',
+           value: selectedCuisine"></select>
          </p>
+       </div>
+
+       <div data-bind="visible: selectedCuisine">
+         <p>Currently viewing <span data-bind="text: selectedCuisine()"></span> restaurants:</p>
        </div>
 
        <div>
