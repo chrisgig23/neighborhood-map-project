@@ -39,30 +39,21 @@ var ViewModel = function() {
   var self = this;
 
   this.placeList = ko.observableArray([]);
+  this.filteredList = ko.observableArray([]);
   this.availableCuisines = ko.observableArray([]);
   this.selectedCuisine = ko.observable();
 
+
   myRestaurants.forEach(function(placeItem){
     self.placeList.push( new Restaurant(placeItem) );
+    self.filteredList.push( new Restaurant(placeItem) );
 
     // If restaurant's cuisine is not already in cuisine list, add it for filtering
     if (self.availableCuisines.indexOf(placeItem.cuisine) == -1) {
       self.availableCuisines.push( placeItem.cuisine );
     };
   });
-
-  self.filterBy = ko.computed(function() {
-    var cuisine = self.selectedCuisine();
-
-    if (!cuisine) {
-      console.log("ALL");
-    } else {
-      console.log(cuisine);
-    };
-  });
-  // console.log(this.availableCuisines());
-
-  this.currentPlace = ko.observable( this.placeList()[0] );
+   this.currentPlace = ko.observable( this.placeList()[0] );
 
   var yelpID = this.placeList()[0].yelpID;
   // console.log(yelpID());
@@ -91,9 +82,7 @@ var ViewModel = function() {
     google.maps.event.trigger(markers[markerID], 'click');
 
     // Hide all markers on map
-    for (var i=0; i < markers.length; i++) {
-      markers[i].setMap(null);
-    }
+    hideRestaurants();
 
     // Center map and zoom over restaurant marker
     map.setCenter(clickedPlace.location());
@@ -107,6 +96,36 @@ var ViewModel = function() {
     // Load Yelp data for bottom tray
     getYelpData(clickedPlace.yelpID());
   };
+
+  self.filterBy = ko.computed(function() {
+    var cuisine = self.selectedCuisine();
+
+    if (!cuisine) { // Show all
+      // Clear filteredList array
+      self.filteredList.removeAll();
+      // Iterate through original array and push all back to filtered
+      for (var i=0;i<self.placeList().length; i++) {
+        self.filteredList.push(self.placeList()[i]);
+      }
+    } else { // Filtered by cuisine
+      // Clear filteredList array
+      self.filteredList.removeAll();
+      // Iterate through original array
+      for (var i=0;i<self.placeList().length; i++) {
+        var thisCuisine = self.placeList()[i].cuisine();
+      // self.placeList.forEach(function(placeItem) {
+        // If the cuisine matches selected cuisine, push to filteredList array
+        if (thisCuisine == cuisine) {
+          self.filteredList.push(self.placeList()[i]);
+        }
+      }
+    };
+
+    if (map) {
+      filterMap(self.filteredList());
+    }
+
+  });
 }
 
 // function displayYelpTray(yelpData) {
@@ -160,6 +179,25 @@ function getYelpData(yelpID) {
   });
 }
 
+function filterMap(list) {
+  // for (var i=0; i<list.length; i++) {
+  //   console.log("Name:"+ list[i].name() );
+  // }
+
+  var bounds = new google.maps.LatLngBounds();
+
+  // Hide all markers on map
+  hideRestaurants();
+
+  // Extend the bounds of the map to include any new markers
+  for (var i=0; i < list.length; i++) {
+    markers[i].setMap(map);
+    markers[i].setAnimation(google.maps.Animation.DROP);
+    bounds.extend(markers[i].position);
+  }
+  map.fitBounds(bounds);
+}
+
 // ----------------------------------------------------------
 // Google Maps API
 var map;
@@ -167,178 +205,171 @@ var map;
 // A blank array to contain all the markers for our restaurants
 var markers = [];
 
+function makeMarkerIcon(markerColor) {
+  var markerImage = new google.maps.MarkerImage('http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor + '|40|_|%E2%80%A2',
+  new google.maps.Size(21,34),
+  new google.maps.Point(0,0),
+  new google.maps.Point(10,34),
+  new google.maps.Size(21,34),
+  );
+  return markerImage;
+}
+
+// When an area is searched, any markers located within the bounds of the map will be displayed.
+function searchWithinBounds() {
+  // Loop through markers array, and save the location of the markers position
+  for (var i = 0; i<markers.length; i++) {
+    var point = new google.maps.LatLng(parseFloat(markers[i].position.lat()), parseFloat(markers[i].position.lng()));
+    var myBounds = map.getBounds();
+
+    // Check if markers position falls within current bounds of the map, and display marker if yes.
+    if (myBounds.contains(point)) {
+      markers[i].setMap(map);
+    } else {
+      markers[i].setMap(null);
+    }
+  }
+}
+
+// This function takes the input value, locates it,
+// and centers our map on that area.
+function zoomToArea() {
+  // Initialize the geocoder
+  var geocoder = new google.maps.Geocoder();
+  // Retrieve the address or place that the user entered
+  var address = document.getElementById('zoom-to-area-text').value;
+  // Check for blank address value
+  if (address == '') {
+    window.alert('You must enter an area, or address.');
+  } else {
+    // Geocode the address/area entered to get the center. Then center the map on it and zoom in.
+    geocoder.geocode(
+      { address:address,
+        componentRestrictions: {locality: 'New York'}
+      }, function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          map.setCenter(results[0].geometry.location);
+          map.setZoom(15);
+          hideRestaurants();
+          searchWithinBounds();
+        } else {
+          window.alert('We could not find that location - try entering a more specific place.');
+        }
+      }
+    )
+  }
+}
+
+// This function hides our restaurant markers when the
+// Hide Restaurants button is clicked
+function hideRestaurants() {
+  for (var i=0; i < markers.length; i++) {
+    markers[i].setMap(null);
+  }
+}
+
+
+// This function shows our restaurant markers when the
+// Show Restaurants button is clicked
+function showRestaurants() {
+  var bounds = new google.maps.LatLngBounds();
+  // Extend the bounds of the map to include any new markers
+  for (var i=0; i < markers.length; i++) {
+    if (markers[i].map != map) {
+      markers[i].setMap(map);
+      markers[i].setAnimation(google.maps.Animation.DROP);
+    }
+    bounds.extend(markers[i].position);
+  }
+  map.fitBounds(bounds);
+}
+
+function populateInfoWindow(marker, infoWindow) {
+  if (infoWindow.marker != marker) {
+    infoWindow.marker = marker;
+    infoWindow.setContent('<div>' + marker.title + '<div>');
+    infoWindow.open(map, marker);
+    // Make sure the marker property is cleared if the infowindow is closed
+    infoWindow.addListener('closeclick', function() {
+      infoWindow.setMarker = null;
+    });
+
+  };
+}
+
 function initMap() {
   // Styles array to use with the map -- Style WY from Snazzy Maps
   var styles = [
-    {
-      "featureType": "all",
-      "elementType": "geometry.fill",
-      "stylers": [
-          {
-              "weight": "2.00"
-          }
-      ]
-    },
-    {
-        "featureType": "all",
-        "elementType": "geometry.stroke",
-        "stylers": [
-            {
-                "color": "#9c9c9c"
-            }
-        ]
-    },
-    {
-        "featureType": "all",
-        "elementType": "labels.text",
-        "stylers": [
-            {
-                "visibility": "on"
-            }
-        ]
-    },
-    {
-        "featureType": "landscape",
-        "elementType": "all",
-        "stylers": [
-            {
-                "color": "#f2f2f2"
-            }
-        ]
-    },
-    {
-        "featureType": "landscape",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "featureType": "landscape.man_made",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "featureType": "poi",
-        "elementType": "all",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "all",
-        "stylers": [
-            {
-                "saturation": -100
-            },
-            {
-                "lightness": 45
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#eeeeee"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#7b7b7b"
-            }
-        ]
-    },
-    {
-        "featureType": "road",
-        "elementType": "labels.text.stroke",
-        "stylers": [
-            {
-                "color": "#ffffff"
-            }
-        ]
-    },
-    {
-        "featureType": "road.highway",
-        "elementType": "all",
-        "stylers": [
-            {
-                "visibility": "simplified"
-            }
-        ]
-    },
-    {
-        "featureType": "road.arterial",
-        "elementType": "labels.icon",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "transit",
-        "elementType": "all",
-        "stylers": [
-            {
-                "visibility": "off"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "all",
-        "stylers": [
-            {
-                "color": "#46bcec"
-            },
-            {
-                "visibility": "on"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "geometry.fill",
-        "stylers": [
-            {
-                "color": "#c8d7d4"
-            }
-        ]
-    },
-    {
-        "featureType": "water",
-        "elementType": "labels.text.fill",
-        "stylers": [
-            {
-                "color": "#070707"
-            }
-        ]
-    },
-    {
-      "featureType": "water",
-      "elementType": "labels.text.stroke",
-      "stylers": [
-          {
-              "color": "#ffffff"
-          }
-      ]
-  }
-  ];
+        {
+            "featureType": "landscape.natural",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "visibility": "on"
+                },
+                {
+                    "color": "#e0efef"
+                }
+            ]
+        },
+        {
+            "featureType": "poi",
+            "elementType": "geometry.fill",
+            "stylers": [
+                {
+                    "visibility": "on"
+                },
+                {
+                    "hue": "#1900ff"
+                },
+                {
+                    "color": "#c0e8e8"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "lightness": 100
+                },
+                {
+                    "visibility": "simplified"
+                }
+            ]
+        },
+        {
+            "featureType": "road",
+            "elementType": "labels",
+            "stylers": [
+                {
+                    "visibility": "off"
+                }
+            ]
+        },
+        {
+            "featureType": "transit.line",
+            "elementType": "geometry",
+            "stylers": [
+                {
+                    "visibility": "on"
+                },
+                {
+                    "lightness": 700
+                }
+            ]
+        },
+        {
+            "featureType": "water",
+            "elementType": "all",
+            "stylers": [
+                {
+                    "color": "#7dcdcd"
+                }
+            ]
+        }
+    ];
 
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 40.586074, lng: -74.156711},
@@ -354,15 +385,7 @@ function initMap() {
 
   var highlightedIcon = makeMarkerIcon('2465c9');
 
-  function makeMarkerIcon(markerColor) {
-      var markerImage = new google.maps.MarkerImage('http://chart.googleapis.com/chart?chst=d_map_spin&chld=1.15|0|' + markerColor + '|40|_|%E2%80%A2',
-      new google.maps.Size(21,34),
-      new google.maps.Point(0,0),
-      new google.maps.Point(10,34),
-      new google.maps.Size(21,34),
-      );
-      return markerImage;
-  }
+
 
   for (var i=0; i<myRestaurants.length; i++) {
     // Get the position from locations array
@@ -403,90 +426,14 @@ function initMap() {
     }
   });
 
+  // document.getElementById('cuisine-type').addEventListener('change', function() {
+  //   // Update map to reflect filtered restaurants
+  //   console.log(ViewModel().filteredList);
+  //   filterMap( ViewModel().filteredList );
+  // });
   document.getElementById('zoom-to-area').addEventListener('click', function() {
     zoomToArea();
   });
-
-  function populateInfoWindow(marker, infoWindow) {
-    if (infoWindow.marker != marker) {
-      infoWindow.marker = marker;
-      infoWindow.setContent('<div>' + marker.title + '<div>');
-      infoWindow.open(map, marker);
-      // Make sure the marker property is cleared if the infowindow is closed
-      infoWindow.addListener('closeclick', function() {
-        infoWindow.setMarker = null;
-      });
-
-    };
-  }
-
-  // This function shows our restaurant markers when the
-  // Show Restaurants button is clicked
-  function showRestaurants() {
-    var bounds = new google.maps.LatLngBounds();
-    // Extend the bounds of the map to include any new markers
-    for (var i=0; i < markers.length; i++) {
-      if (markers[i].map != map) {
-        markers[i].setMap(map);
-        markers[i].setAnimation(google.maps.Animation.DROP);
-      }
-      bounds.extend(markers[i].position);
-    }
-    map.fitBounds(bounds);
-  }
-
-  // This function hides our restaurant markers when the
-  // Hide Restaurants button is clicked
-  function hideRestaurants() {
-    for (var i=0; i < markers.length; i++) {
-      markers[i].setMap(null);
-    }
-  }
-
-  // This function takes the input value, locates it,
-  // and centers our map on that area.
-  function zoomToArea() {
-    // Initialize the geocoder
-    var geocoder = new google.maps.Geocoder();
-    // Retrieve the address or place that the user entered
-    var address = document.getElementById('zoom-to-area-text').value;
-    // Check for blank address value
-    if (address == '') {
-      window.alert('You must enter an area, or address.');
-    } else {
-      // Geocode the address/area entered to get the center. Then center the map on it and zoom in.
-      geocoder.geocode(
-        { address:address,
-          componentRestrictions: {locality: 'New York'}
-        }, function(results, status) {
-          if (status == google.maps.GeocoderStatus.OK) {
-            map.setCenter(results[0].geometry.location);
-            map.setZoom(15);
-            hideRestaurants();
-            searchWithinBounds();
-          } else {
-            window.alert('We could not find that location - try entering a more specific place.');
-          }
-        }
-      )
-    }
-  }
-
-  // When an area is searched, any markers located within the bounds of the map will be displayed.
-  function searchWithinBounds() {
-    // Loop through markers array, and save the location of the markers position
-    for (var i = 0; i<markers.length; i++) {
-      var point = new google.maps.LatLng(parseFloat(markers[i].position.lat()), parseFloat(markers[i].position.lng()));
-      var myBounds = map.getBounds();
-
-      // Check if markers position falls within current bounds of the map, and display marker if yes.
-      if (myBounds.contains(point)) {
-        markers[i].setMap(map);
-      } else {
-        markers[i].setMap(null);
-      }
-    }
-  }
 }
 
 ko.applyBindings(new ViewModel(map));

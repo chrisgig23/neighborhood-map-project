@@ -33,7 +33,7 @@
        </div>
 
        <div>
-         <ul id="list-of-restaurants" data-bind="foreach: placeList">
+         <ul id="list-of-restaurants" data-bind="foreach: filteredList">
            <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace, event: { mouseover: $parent.highlightMarker }">
          </ul>
        </div>
@@ -54,9 +54,9 @@
 
 
    <!-- load the google maps API asynchronously -->
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBna-rkcPJFEHAtzSw6f086tTAFqtPkQZo&v=3&callback=initMap">
    </script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
    <script src="js/lib/knockout-3.2.0.js"></script>
    <script src="js/app.js"></script>
 
