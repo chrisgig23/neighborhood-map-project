@@ -134,21 +134,7 @@ var ViewModel = function() {
 //     this.yelpName = ko.observable(yelpData.name);
 // }
 
-var YelpInfo = function(data) {
-  // console.log(data);
-  this.yelpName = ko.observable(data.name);
-  this.rating = ko.observable(data.rating);
-  this.address = ko.observable(data.location.address1);
-  this.phone = ko.observable(data.phone);
-  // this.hours = ko.observableArray([]);
-  this.imgSrc = ko.observable(data.image_url);
-  console.log(this.yelpName());
-  console.log(this.rating());
-  console.log(this.address());
-  console.log(this.phone());
-  // console.log(this.hours());
-  console.log(this.imgSrc());
-}
+
 
 
 
@@ -265,6 +251,7 @@ function populateInfoWindow(marker, infoWindow) {
 
   self.yelpData = ko.observableArray([]);
   var contentString = '';
+  var yelpLogoImgSrc = '/assets/Yelp_logo.png';
   var yelpID = marker.yelpID;
   if (infoWindow.marker != marker) {
     infoWindow.marker = marker;
@@ -285,7 +272,29 @@ function populateInfoWindow(marker, infoWindow) {
 
     $.ajax(settings).done(function (response) {
       success: {
-        contentString = '<div>' + response.name + '<div>' + response.location.address1;
+        var starCountImg = yelpStarGenerator(response.rating);
+
+        contentString = (
+          '<div class="info-window-resInfo">' +
+            '<div class="powered-by">' +
+              '<p>Powered by <img id="yelp-logo" src="' + yelpLogoImgSrc + '" alt="yelp logo">' +
+            '</div>' +
+            '<div class="restaurant-info"' +
+              '<p id="yelp-name">' +
+                response.name +
+              '</p>' +
+              '<p id="yelp-address">' +
+                response.location.address1 +
+              '</p>' +
+              '<a href="tel: ' + response.phone + '">' +
+                response.phone +
+              '</a> ' +
+            '</div>' +
+            '<div class="yelp-star-icons">' +
+              '<img src="' + starCountImg + '" alt="yelp stars">' +
+            '</div>' +
+          '</div>'
+        );
       }
 
       infoWindow.setContent(contentString);
@@ -308,6 +317,60 @@ function populateInfoWindow(marker, infoWindow) {
   };
 }
 
+function yelpStarGenerator (starCount){
+  var imgSrc = '/assets/yelp_stars/web_and_ios/small/';
+  switch (starCount) {
+    case 0:
+      imgSrc = imgSrc + '0stars.png';
+      break;
+    case 1:
+      imgSrc = imgSrc + '1stars.png';
+      break;
+    case 1.5:
+      imgSrc = imgSrc + '1halfstars.png';
+      break;
+    case 2:
+      imgSrc = imgSrc + '2stars.png';
+      break;
+    case 2.5:
+      imgSrc = imgSrc + '2halfstars.png';
+      break;
+    case 3:
+      imgSrc = imgSrc + '3stars.png';
+      break;
+    case 3.5:
+      imgSrc = imgSrc + '3halfstars.png';
+      break;
+    case 4:
+      imgSrc = imgSrc + '4stars.png';
+      break;
+    case 4.5:
+      imgSrc = imgSrc + '4halfstars.png';
+      break;
+    case 5:
+      imgSrc = imgSrc + '5stars.png';
+      break;
+  }
+
+  return imgSrc;
+}
+
+
+var YelpInfo = function(data) {
+  // console.log(data);
+  this.yelpName = ko.observable(data.name);
+  this.rating = ko.observable(data.rating);
+  this.address = ko.observable(data.location.address1);
+  this.phone = ko.observable(data.phone);
+  // this.hours = ko.observableArray([]);
+  this.imgSrc = ko.observable(data.image_url);
+  console.log(this.yelpName());
+  console.log(this.rating());
+  console.log(this.address());
+  console.log(this.phone());
+  // console.log(this.hours());
+  console.log(this.imgSrc());
+}
 // // Access Yelp API
 // function getYelpData(yelpID) {
 //   var settings = {

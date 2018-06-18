@@ -47,3 +47,34 @@ html, body {
   background-color: lightblue;
   /*display: none;*/
 }
+
+#yelp-logo {
+  height: 60px;
+}
+
+.yelp-star-icons img {
+  padding-top: 10px;
+  height: 20px;
+}
+
+#yelp-name {
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.powered-by {
+  display: flex;
+  font-size: 10px;
+  padding:0;
+  margin:0;
+}
+
+.info-window-resInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.restaurant-info {
+  padding:0;
+  margin:0;
+}
