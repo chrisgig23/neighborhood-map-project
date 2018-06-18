@@ -94,7 +94,7 @@ var ViewModel = function() {
     }
     // var yelpID = ;
     // Load Yelp data for bottom tray
-    getYelpData(clickedPlace.yelpID());
+    // getYelpData(clickedPlace.yelpID());
   };
 
   self.filterBy = ko.computed(function() {
@@ -261,46 +261,81 @@ function showRestaurants() {
 }
 
 function populateInfoWindow(marker, infoWindow) {
+  var self = this
+
+  self.yelpData = ko.observableArray([]);
+  var contentString = '';
+  var yelpID = marker.yelpID;
   if (infoWindow.marker != marker) {
     infoWindow.marker = marker;
-    infoWindow.setContent('<div>' + marker.title + '<div>');
+
+    var settings = {
+      "async": true,
+      "crossDomain": true,
+      // Pass in the Yelp business ID for the clicked restaurant
+      "url": "https://api.yelp.com/v3/businesses/" + yelpID,
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
+        "Cache-Control": "no-cache",
+        "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
+      },
+      "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
+    }
+
+    $.ajax(settings).done(function (response) {
+      success: {
+        contentString = '<div>' + response.name + '<div>' + response.location.address1;
+      }
+
+      infoWindow.setContent(contentString);
+
+      // statusCode: {
+      //   404: function() {
+        //     console.log("ERROR - Restaurant Not Found");
+      //   }
+      // };
+      // }
+      // self.yelpData.push(response);
+
+    });
+
     infoWindow.open(map, marker);
     // Make sure the marker property is cleared if the infowindow is closed
     infoWindow.addListener('closeclick', function() {
       infoWindow.setMarker = null;
     });
-
   };
 }
 
-// Access Yelp API
-function getYelpData(yelpID) {
-  var settings = {
-    "async": true,
-    "crossDomain": true,
-    // Pass in the Yelp business ID for the clicked restaurant
-    "url": "https://api.yelp.com/v3/businesses/" + yelpID,
-    "method": "GET",
-    "headers": {
-      "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
-      "Cache-Control": "no-cache",
-      "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
-    },
-    "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
-  }
-
-  console.log(settings.url);
-
-  $.ajax(settings).done(function (response) {
-    console.log(response);
-
-    YelpInfo(response);
-
-    // return response;
-    // console.log("ERROR - Restaurant Not Found")
-
-  });
-}
+// // Access Yelp API
+// function getYelpData(yelpID) {
+//   var settings = {
+//     "async": true,
+//     "crossDomain": true,
+//     // Pass in the Yelp business ID for the clicked restaurant
+//     "url": "https://api.yelp.com/v3/businesses/" + yelpID,
+//     "method": "GET",
+//     "headers": {
+//       "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
+//       "Cache-Control": "no-cache",
+//       "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
+//     },
+//     "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
+//   }
+//
+//   // console.log(settings.url);
+//
+//   $.ajax(settings).done(function (response) {
+//     console.log(response);
+//
+//     return(response);
+//
+//     // return response;
+//     // console.log("ERROR - Restaurant Not Found")
+//
+//   });
+// }
 
 function initMap() {
   // Styles array to use with the map -- Style WY from Snazzy Maps
@@ -397,12 +432,14 @@ function initMap() {
     // Get the position from locations array
     var position = myRestaurants[i].location;
     var title = myRestaurants[i].name;
+    var yelpID = myRestaurants[i].yelpID;
     var marker = new google.maps.Marker({
       // map:map,
       position:position,
       title:title,
       icon: defaultIcon,
       animation: google.maps.Animation.DROP,
+      yelpID: yelpID,
       id: i
     });
 
