@@ -275,6 +275,14 @@ function populateInfoWindow(marker, infoWindow) {
         // console.log(response);
         var starCountImg = yelpStarGenerator(response.rating);
 
+        var todaysHours = '';
+
+        if (response.hours[0].is_open_now) {
+          todaysHours = "Today's Hours: " +  hoursCalc(response.hours[0].open); // returns formatted hours string
+        } else {
+          todaysHours = "Closed today";
+        }
+
         contentString = (
           '<div class="info-window-resInfo">' +
             '<div class="powered-by">' +
@@ -292,8 +300,11 @@ function populateInfoWindow(marker, infoWindow) {
               '</a> ' +
             '</div>' +
             '<div class="yelp-star-icons">' +
-              '<img src="' + starCountImg + '" alt="yelp stars">' +
               '<a href="' + response.url + '"><img src="' + starCountImg + '" alt="yelp stars">' +
+              '<p>Read more</p></a>' +
+            '</div>' +
+            '<div class="todays-hours">' +
+              '<p>' + todaysHours + '</p>' +
             '</div>' +
           '</div>'
         );
@@ -317,6 +328,42 @@ function populateInfoWindow(marker, infoWindow) {
       infoWindow.setMarker = null;
     });
   };
+}
+
+// Function takes in hours array from Yelp API and converts it into formatted string
+function hoursCalc(openHours) {
+  // console.log(openHours);
+  var today = new Date();
+  today = today.getDay();
+  if (today == 0) { // Sunday
+    today = 7;
+  } else { // Every other day
+    today--; // Convert today to Yelp time
+  }
+
+  var openToday = openHours[today].start;
+  openToday = formatTime(openToday);
+  var closeToday = openHours[today].end;
+  closeToday = formatTime(closeToday);
+  // console.log(openToday + " - " + closeToday);
+  return openToday + " - " + closeToday;
+}
+
+// Function takes in military time, and converts to 12 hour clock with AM/PM
+function formatTime(time) {
+  var hours = time.slice(0,2);
+  var minutes = time.slice(2,4);
+  var ampm = '';
+
+  if (hours>12) {
+    ampm = 'pm';
+    hours = hours - 12;
+  } else {
+    ampm = 'am';
+  }
+
+  // console.log (hours + ':' + minutes + ampm);
+  return (hours + ':' + minutes + ampm);
 }
 
 function yelpStarGenerator (starCount){
