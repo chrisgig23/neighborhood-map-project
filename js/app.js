@@ -122,7 +122,7 @@ var ViewModel = function() {
     };
 
     if (map) {
-      console.log(self.filteredList()[0].placeId() );
+      // console.log(self.filteredList()[0].placeId() );
       filterMap(self.filteredList());
     }
 
@@ -272,6 +272,7 @@ function populateInfoWindow(marker, infoWindow) {
 
     $.ajax(settings).done(function (response) {
       success: {
+        // console.log(response);
         var starCountImg = yelpStarGenerator(response.rating);
 
         contentString = (
@@ -372,34 +373,6 @@ var YelpInfo = function(data) {
   // console.log(this.hours());
   console.log(this.imgSrc());
 }
-// // Access Yelp API
-// function getYelpData(yelpID) {
-//   var settings = {
-//     "async": true,
-//     "crossDomain": true,
-//     // Pass in the Yelp business ID for the clicked restaurant
-//     "url": "https://api.yelp.com/v3/businesses/" + yelpID,
-//     "method": "GET",
-//     "headers": {
-//       "Authorization": "Bearer nOpnNpO7xDeJt_YSypp1XJnL5__h4-i7QTvUYi7RS5VwFuk6ID4Q8IrbM5epxCFpQENG1Q7gy-NWeR8NefBLBo-ZK8x8-0ck3cfQ9mkvTzBDKxBvGIXzrtjO3bcWW3Yx",
-//       "Cache-Control": "no-cache",
-//       "Postman-Token": "dec353d8-ca31-7d0e-a03d-65c6381c0574"
-//     },
-//     "data": "{\"username\":\"Chris\", \"password\":\"Udacity\"}"
-//   }
-//
-//   // console.log(settings.url);
-//
-//   $.ajax(settings).done(function (response) {
-//     console.log(response);
-//
-//     return(response);
-//
-//     // return response;
-//     // console.log("ERROR - Restaurant Not Found")
-//
-//   });
-// }
 
 function initMap() {
   // Styles array to use with the map -- Style WY from Snazzy Maps
