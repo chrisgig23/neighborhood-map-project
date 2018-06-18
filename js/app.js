@@ -292,6 +292,7 @@ function populateInfoWindow(marker, infoWindow) {
             '</div>' +
             '<div class="yelp-star-icons">' +
               '<img src="' + starCountImg + '" alt="yelp stars">' +
+              '<a href="' + response.url + '"><img src="' + starCountImg + '" alt="yelp stars">' +
             '</div>' +
           '</div>'
         );
