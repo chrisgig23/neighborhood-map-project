@@ -320,6 +320,11 @@ function populateInfoWindow(marker, infoWindow) {
       // }
       // self.yelpData.push(response);
 
+    }).fail(function (xhr) {
+      if (xhr.status == 404) {
+        console.log("ERROR - Restaurant Not Found");
+        infoWindow.setContent('<p>Restaurant Info Not Found</p>');
+      }
     });
 
     infoWindow.open(map, marker);
