@@ -324,10 +324,11 @@ function populateInfoWindow(marker, infoWindow) {
       if (xhr.status == 404) {
         console.log("ERROR - Restaurant Not Found");
         infoWindow.setContent('<p>Restaurant Info Not Found</p>');
+        infoWindow.open(map, marker);
       }
     });
 
-    infoWindow.open(map, marker);
+
     // Make sure the marker property is cleared if the infowindow is closed
     infoWindow.addListener('closeclick', function() {
       infoWindow.setMarker = null;
