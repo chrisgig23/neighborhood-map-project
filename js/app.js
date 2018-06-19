@@ -235,6 +235,7 @@ function hideRestaurants() {
 // Show Restaurants button is clicked
 function showRestaurants() {
   var bounds = new google.maps.LatLngBounds();
+
   // Extend the bounds of the map to include any new markers
   for (var i=0; i < markers.length; i++) {
     if (markers[i].map != map) {
@@ -271,46 +272,48 @@ function populateInfoWindow(marker, infoWindow) {
     }
 
     $.ajax(settings).done(function (response) {
-      success: {
-        // console.log(response);
-        var starCountImg = yelpStarGenerator(response.rating);
+      // console.log(response);
+      var starCountImg = yelpStarGenerator(response.rating);
 
-        var todaysHours = '';
+      var todaysHours = '';
 
-        if (response.hours[0].is_open_now) {
-          todaysHours = "Today's Hours: " +  hoursCalc(response.hours[0].open); // returns formatted hours string
-        } else {
-          todaysHours = "Closed today";
-        }
-
-        contentString = (
-          '<div class="info-window-resInfo">' +
-            '<div class="powered-by">' +
-              '<p>Powered by <img id="yelp-logo" src="' + yelpLogoImgSrc + '" alt="yelp logo">' +
-            '</div>' +
-            '<div class="restaurant-info"' +
-              '<p id="yelp-name">' +
-                response.name +
-              '</p>' +
-              '<p id="yelp-address">' +
-                response.location.address1 +
-              '</p>' +
-              '<a href="tel: ' + response.phone + '">' +
-                response.phone +
-              '</a> ' +
-            '</div>' +
-            '<div class="yelp-star-icons">' +
-              '<a href="' + response.url + '"><img src="' + starCountImg + '" alt="yelp stars">' +
-              '<p>Read more</p></a>' +
-            '</div>' +
-            '<div class="todays-hours">' +
-              '<p>' + todaysHours + '</p>' +
-            '</div>' +
-          '</div>'
-        );
+      if (response.hours[0].is_open_now) {
+        todaysHours = "Today's Hours: " +  hoursCalc(response.hours[0].open); // returns formatted hours string
+      } else {
+        todaysHours = "Closed today";
       }
 
+      contentString = (
+        '<div class="info-window-resInfo">' +
+          '<div class="powered-by">' +
+            '<p>Powered by <img id="yelp-logo" src="' + yelpLogoImgSrc + '" alt="yelp logo">' +
+          '</div>' +
+          '<div class="restaurant-image">' +
+            '<img src="' + response.image_url + '" alt="restaurant image"' +
+          '</div>' +
+          '<div class="restaurant-info"' +
+            '<p id="yelp-name">' +
+              response.name +
+            '</p>' +
+            '<p id="yelp-address">' +
+              response.location.address1 +
+            '</p>' +
+            '<a href="tel: ' + response.phone + '">' +
+              response.phone +
+            '</a> ' +
+          '</div>' +
+          '<div class="yelp-star-icons">' +
+            '<a target="_blank" href="' + response.url + '"><img src="' + starCountImg + '" alt="yelp stars">' +
+            '<p>Read more</p></a>' +
+          '</div>' +
+          '<div class="todays-hours">' +
+            '<p>' + todaysHours + '</p>' +
+          '</div>' +
+        '</div>'
+      );
+
       infoWindow.setContent(contentString);
+      infoWindow.open(map, marker);
 
       // statusCode: {
       //   404: function() {
