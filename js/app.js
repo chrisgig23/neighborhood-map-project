@@ -260,6 +260,9 @@ function populateInfoWindow(marker, infoWindow) {
           '<div class="todays-hours">' +
             '<p>' + todaysHours + '</p>' +
           '</div>' +
+          '<div class="powered-by">' +
+            '<p>Powered by </p><img id="yelp-logo" src="' + yelpLogoImgSrc + '" alt="yelp logo">' +
+          '</div>' +
         '</div>'
       );
 
