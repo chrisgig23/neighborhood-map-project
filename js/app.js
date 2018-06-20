@@ -5,10 +5,7 @@ var Restaurant = function(data) {
   this.placeId = ko.observable(data.id);
   // this.imgSrc = ko.observable(data.name);
   this.yelpID = ko.observable(data.yelpID);
-
-
 }
-
 
 var myRestaurants = [
   {
@@ -24,17 +21,6 @@ var myRestaurants = [
   }
 ];
 
-// ko.components.register('yelp-widget', {
-//   viewModel: function(params) {
-//     console.log("yelpID: " + yelpID.value);
-//     getYelpData(yelpID.value);
-//
-//     console.log(YelpInfo.yelpName);
-//
-//   },
-//   template: '<div class="yelp-tray" data-bind="visible: YelpInfo.yelpName">\ </div>'
-// });
-
 var ViewModel = function() {
   var self = this;
 
@@ -42,7 +28,6 @@ var ViewModel = function() {
   this.filteredList = ko.observableArray([]);
   this.availableCuisines = ko.observableArray([]);
   this.selectedCuisine = ko.observable();
-
 
   myRestaurants.forEach(function(placeItem){
     self.placeList.push( new Restaurant(placeItem) );
@@ -56,10 +41,6 @@ var ViewModel = function() {
    this.currentPlace = ko.observable( this.placeList()[0] );
 
   var yelpID = this.placeList()[0].yelpID;
-  // console.log(yelpID());
-
-  // Load Yelp data for bottom tray
-  // getYelpData(yelpID);
 
   this.highlightMarker = function(clickedPlace) {
     var markerID = clickedPlace.placeId();
@@ -68,7 +49,6 @@ var ViewModel = function() {
 
   this.defaultMarker = function(clickedPlace) {
     var markerID = clickedPlace.placeId();
-    // markers[markerID].makeMarkerIcon('93a7c6');
   }
 
   // When list item is clicked, update map
@@ -92,9 +72,6 @@ var ViewModel = function() {
       markers[markerID].setMap(map);
       markers[markerID].setAnimation(google.maps.Animation.DROP);
     }
-    // var yelpID = ;
-    // Load Yelp data for bottom tray
-    // getYelpData(clickedPlace.yelpID());
   };
 
   self.filterBy = ko.computed(function() {
@@ -113,7 +90,6 @@ var ViewModel = function() {
       // Iterate through original array
       for (var i=0;i<self.placeList().length; i++) {
         var thisCuisine = self.placeList()[i].cuisine();
-      // self.placeList.forEach(function(placeItem) {
         // If the cuisine matches selected cuisine, push to filteredList array
         if (thisCuisine == cuisine) {
           self.filteredList.push(self.placeList()[i]);
@@ -122,29 +98,13 @@ var ViewModel = function() {
     };
 
     if (map) {
-      // console.log(self.filteredList()[0].placeId() );
       filterMap(self.filteredList());
     }
 
   });
 }
 
-// function displayYelpTray(yelpData) {
-//     console.log(yelpData);
-//     this.yelpName = ko.observable(yelpData.name);
-// }
-
-
-
-
-
 function filterMap(list) {
-  // for (var i=0; i<list.length; i++) {
-  //   console.log("Name:"+ list[i].name() );
-  //   console.log(list[i].location() );
-  //   console.log(list[i].placeId() )
-  // }
-
   var bounds = new google.maps.LatLngBounds();
 
   // Hide all markers on map
@@ -160,8 +120,6 @@ function filterMap(list) {
   map.fitBounds(bounds);
 }
 
-// ----------------------------------------------------------
-// Google Maps API
 var map;
 
 // A blank array to contain all the markers for our restaurants
@@ -229,7 +187,6 @@ function hideRestaurants() {
     markers[i].setMap(null);
   }
 }
-
 
 // This function shows our restaurant markers when the
 // Show Restaurants button is clicked
@@ -309,14 +266,6 @@ function populateInfoWindow(marker, infoWindow) {
       infoWindow.setContent(contentString);
       infoWindow.open(map, marker);
 
-      // statusCode: {
-      //   404: function() {
-        //     console.log("ERROR - Restaurant Not Found");
-      //   }
-      // };
-      // }
-      // self.yelpData.push(response);
-
     }).fail(function (xhr) {
       if (xhr.status == 404) {
         console.log("ERROR - Restaurant Not Found");
@@ -324,7 +273,6 @@ function populateInfoWindow(marker, infoWindow) {
         infoWindow.open(map, marker);
       }
     });
-
 
     // Make sure the marker property is cleared if the infowindow is closed
     infoWindow.addListener('closeclick', function() {
@@ -393,7 +341,6 @@ function formatTime(time) {
     ampm = 'am';
   }
 
-  // console.log (hours + ':' + minutes + ampm);
   return (hours + ':' + minutes + ampm);
 }
 
@@ -433,23 +380,6 @@ function yelpStarGenerator (starCount){
   }
 
   return imgSrc;
-}
-
-
-var YelpInfo = function(data) {
-  // console.log(data);
-  this.yelpName = ko.observable(data.name);
-  this.rating = ko.observable(data.rating);
-  this.address = ko.observable(data.location.address1);
-  this.phone = ko.observable(data.phone);
-  // this.hours = ko.observableArray([]);
-  this.imgSrc = ko.observable(data.image_url);
-  console.log(this.yelpName());
-  console.log(this.rating());
-  console.log(this.address());
-  console.log(this.phone());
-  // console.log(this.hours());
-  console.log(this.imgSrc());
 }
 
 function initMap() {
@@ -541,8 +471,6 @@ function initMap() {
 
   var highlightedIcon = makeMarkerIcon('2465c9');
 
-
-
   for (var i=0; i<myRestaurants.length; i++) {
     // Get the position from locations array
     var position = myRestaurants[i].location;
@@ -584,11 +512,6 @@ function initMap() {
     }
   });
 
-  // document.getElementById('cuisine-type').addEventListener('change', function() {
-  //   // Update map to reflect filtered restaurants
-  //   console.log(ViewModel().filteredList);
-  //   filterMap( ViewModel().filteredList );
-  // });
   document.getElementById('zoom-to-area').addEventListener('click', function() {
     zoomToArea();
   });
