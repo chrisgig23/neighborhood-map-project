@@ -274,7 +274,7 @@ function populateInfoWindow(marker, infoWindow) {
     $.ajax(settings).done(function (response) {
       // console.log(response);
       var starCountImg = yelpStarGenerator(response.rating);
-
+      var phoneNumber = formatPhone(response.phone);
       var todaysHours = '';
 
       if (response.hours[0].is_open_now) {
@@ -299,7 +299,7 @@ function populateInfoWindow(marker, infoWindow) {
               response.location.address1 +
             '</p>' +
             '<a href="tel: ' + response.phone + '">' +
-              response.phone +
+              phoneNumber +
             '</a> ' +
           '</div>' +
           '<div class="yelp-star-icons">' +
@@ -337,6 +337,17 @@ function populateInfoWindow(marker, infoWindow) {
       infoWindow.setMarker = null;
     });
   };
+}
+
+// Function takes in raw phone number, and formats it to user-friendly output
+function formatPhone(phone) {
+  var areacode = phone.slice(2,5);
+  var prefix = phone.slice(5,8);
+  var lineNumber = phone.slice(8);
+
+  phone = "(" + areacode + ") " + prefix + "-" + lineNumber;
+
+  return phone
 }
 
 // Function takes in hours array from Yelp API and converts it into formatted string
