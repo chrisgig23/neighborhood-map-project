@@ -277,17 +277,11 @@ function populateInfoWindow(marker, infoWindow) {
       var phoneNumber = formatPhone(response.phone);
       var todaysHours = '';
 
-      if (response.hours[0].is_open_now) {
-        todaysHours = "Today's Hours: " +  hoursCalc(response.hours[0].open); // returns formatted hours string
-      } else {
-        todaysHours = "Closed today";
-      }
+      // returns formatted hours string
+      todaysHours = hoursCalc(response.hours[0]);
 
       contentString = (
         '<div class="info-window-resInfo">' +
-          '<div class="powered-by">' +
-            '<p>Powered by <img id="yelp-logo" src="' + yelpLogoImgSrc + '" alt="yelp logo">' +
-          '</div>' +
           '<div class="restaurant-image">' +
             '<img src="' + response.image_url + '" alt="restaurant image"' +
           '</div>' +
@@ -351,22 +345,39 @@ function formatPhone(phone) {
 }
 
 // Function takes in hours array from Yelp API and converts it into formatted string
-function hoursCalc(openHours) {
-  // console.log(openHours);
+// Possible return values are the current hours (if open), current hours with Closed now if opening at some point today, and 'Closed today' if closed all day.
+function hoursCalc(hours) {
+  // Yelp's week starts with Monday at index 0, while javascript's Date function starts with Sunday at index 0.
   var today = new Date();
   today = today.getDay();
   if (today == 0) { // Sunday
-    today = 7;
+    today = 6; // Yelp's Sunday
   } else { // Every other day
     today--; // Convert today to Yelp time
+  }
+
+  var isOpen = hours.is_open_now;
+  var openHours = hours.open;
+
+  var openDays = [];
+  for (var i=0; i<openHours.length; i++) {
+    openDays.push(openHours[i].day);
   }
 
   var openToday = openHours[today].start;
   openToday = formatTime(openToday);
   var closeToday = openHours[today].end;
   closeToday = formatTime(closeToday);
-  // console.log(openToday + " - " + closeToday);
-  return openToday + " - " + closeToday;
+  var todaysHours = openToday + " - " + closeToday
+  if (openDays.includes(today)) {
+    if (isOpen) {
+      return todaysHours;
+    } else {
+      return todaysHours + " (Closed now)";
+    }
+  } else {
+    return "Closed today";
+  }
 }
 
 // Function takes in military time, and converts to 12 hour clock with AM/PM
