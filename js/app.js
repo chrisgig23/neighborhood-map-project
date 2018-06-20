@@ -341,6 +341,7 @@ function formatTime(time) {
     ampm = 'pm';
     hours = hours - 12;
   } else {
+    hours = hours - 0;
     ampm = 'am';
   }
 
