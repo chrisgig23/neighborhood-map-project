@@ -505,7 +505,10 @@ function initMap() {
   }
   showRestaurants(); // Display markers by default
 
-  document.getElementById('show-restaurants').addEventListener('click', showRestaurants);
+  document.getElementById('show-restaurants').addEventListener('click', function() {
+    showRestaurants();
+    largeInfoWindow.close();
+  });
   document.getElementById('hide-restaurants').addEventListener('click', hideRestaurants);
 
   // Allow Enter key to submit text entry.
