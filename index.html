@@ -4,12 +4,13 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="css/styles.css">
+   <link href="https://fonts.googleapis.com/css?family=Encode+Sans+Condensed" rel="stylesheet">
  </head>
  <body>
-   <div class="container">
-     <div class="options-box">
-       <h1>Favorite Restaurants</h1>
-       <div>
+   <div class="page">
+     <div class="sidebar">
+       <h1 class ="page-title">Favorite Restaurants</h1>
+       <div class="show-hide">
          <input id="show-restaurants" type="button" value="Show Restaurants">
          <input id="hide-restaurants" type="button" value="Hide Restaurants">
        </div>
@@ -19,7 +20,7 @@
          <input id="zoom-to-area" type="button" value="Zoom">
        </div>
 
-       <div>
+       <div class="cuisine-filter">
          <p>
            Filter by Cuisine:
            <select id="cuisine-type" data-bind="options: availableCuisines,
@@ -28,7 +29,7 @@
          </p>
        </div>
 
-       <div data-bind="visible: selectedCuisine">
+       <div class="current-view" data-bind="visible: selectedCuisine">
          <p>Currently viewing <span data-bind="text: selectedCuisine()"></span> restaurants:</p>
        </div>
 
@@ -41,17 +42,7 @@
 
      <div id="map"></div>
 
-     <!-- <div id="yelp-tray">
-       <h1 data-bind="text: name"></h1>
-     </div> -->
-     <!-- <yelp-widget params="value: 'HBcmdviQgkWO4bqgxAjtNw'"></yelp-widget> -->
-
-     <!-- <div id="yelp-tray" data-bind="with: YelpInfo">
-      <h1 data-bind="text: yelpName"></h1>
-     </div> -->
    </div>
-
-
 
    <!-- load the google maps API asynchronously -->
    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBna-rkcPJFEHAtzSw6f086tTAFqtPkQZo&v=3&callback=initMap">
