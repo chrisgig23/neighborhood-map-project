@@ -5,44 +5,52 @@
    <meta name="viewport" content="width=device-width, initial-scale=1">
    <link rel="stylesheet" href="css/styles.css">
    <link href="https://fonts.googleapis.com/css?family=Encode+Sans+Condensed" rel="stylesheet">
+   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
  </head>
  <body>
-   <div class="page">
-     <div class="sidebar">
-       <h1 class ="page-title">Favorite Restaurants</h1>
-       <div class="show-hide">
-         <input id="show-restaurants" type="button" value="Show Restaurants">
-         <input id="hide-restaurants" type="button" value="Hide Restaurants">
-       </div>
-       <hr>
-       <div>
-         <input id="zoom-to-area-text" type="text" placeholder="Enter the area you'd like to search">
-         <input id="zoom-to-area" type="button" value="Zoom">
-       </div>
+   <!-- <div class="page"> -->
+  <div class="header">
+    <a><i class="fas fa-bars fa-2x"></i></a>
+    <h1 class="page-title">Favorite Restaurants</h1>
+    <div></div>
+  </div>
+  <div class="sidebar">
+    <div class="sidebar-contents">
+      <h1 class ="page-title">Favorite Restaurants</h1>
+      <div class="show-hide">
+        <input id="show-restaurants" type="button" value="Show Restaurants">
+        <input id="hide-restaurants" type="button" value="Hide Restaurants">
+      </div>
+      <hr>
+      <div>
+        <input id="zoom-to-area-text" type="text" placeholder="Enter the area you'd like to search">
+        <input id="zoom-to-area" type="button" value="Zoom">
+      </div>
 
-       <div class="cuisine-filter">
-         <p>
-           Filter by Cuisine:
-           <select id="cuisine-type" data-bind="options: availableCuisines,
-           optionsCaption: 'Show All',
-           value: selectedCuisine"></select>
-         </p>
-       </div>
+      <div class="cuisine-filter">
+        <p>
+          Filter by Cuisine:
+          <select id="cuisine-type" data-bind="options: availableCuisines,
+          optionsCaption: 'Show All',
+          value: selectedCuisine"></select>
+        </p>
+      </div>
 
-       <div class="current-view" data-bind="visible: selectedCuisine">
-         <p>Currently viewing <span data-bind="text: selectedCuisine()"></span> restaurants:</p>
-       </div>
+      <div class="current-view" data-bind="visible: selectedCuisine">
+        <p>Currently viewing <span data-bind="text: selectedCuisine()"></span> restaurants:</p>
+      </div>
 
-       <div>
-         <ul id="list-of-restaurants" data-bind="foreach: filteredList">
-           <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace, event: { mouseover: $parent.highlightMarker }">
-         </ul>
-       </div>
-     </div>
+      <div>
+        <ul id="list-of-restaurants" data-bind="foreach: filteredList">
+          <li id="restaurant-name" data-bind="text: name, click: $parent.setPlace, event: { mouseover: $parent.highlightMarker }">
+        </ul>
+      </div>
+    </div>
+  </div>
 
-     <div id="map"></div>
-
-   </div>
+   <div id="map"></div>
+   <!-- </div> -->
+   <!-- </div> -->
 
    <!-- load the google maps API asynchronously -->
    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBna-rkcPJFEHAtzSw6f086tTAFqtPkQZo&v=3&callback=initMap">
