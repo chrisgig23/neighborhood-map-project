@@ -44,7 +44,6 @@ var ViewModel = function() {
 
   this.highlightMarker = function(clickedPlace) {
     var markerID = clickedPlace.placeId();
-    // markers[markerID].makeMarkerIcon('2465c9');
   };
 
   this.defaultMarker = function(clickedPlace) {
@@ -54,7 +53,6 @@ var ViewModel = function() {
   // When list item is clicked, update map
   this.setPlace = function(clickedPlace) {
     self.currentPlace(clickedPlace);
-// Maybe separate the below into function
 
     var windowSize = $(window).width();
     if (windowSize < 961) {
@@ -101,6 +99,8 @@ var ViewModel = function() {
       }
     };
 
+    // If the map is loaded, send list of restaurants to DOM
+    // This IF statement only matters on initial page load
     if (map) {
       filterMap(self.filteredList());
     }
@@ -330,7 +330,7 @@ function formatPhone(phone) {
 }
 
 // Function takes in hours array from Yelp API and converts it into formatted string
-// Possible return values are the current hours (if open), current hours with Closed now if opening at some point today, and 'Closed today' if closed all day.
+// Possible return values are the current hours (if open), current hours with 'Closed now' if opening at some point today, and 'Closed today' if closed all day.
 function hoursCalc(hours) {
   // Yelp's week starts with Monday at index 0, while javascript's Date function starts with Sunday at index 0.
   var today = new Date();
@@ -382,6 +382,7 @@ function formatTime(time) {
   return (hours + ':' + minutes + ampm);
 }
 
+// Function takes in rating from Yelp API, and retrieves corresponding stars image
 function yelpStarGenerator (starCount){
   var imgSrc = '/assets/yelp_stars/web_and_ios/small/';
   switch (starCount) {
