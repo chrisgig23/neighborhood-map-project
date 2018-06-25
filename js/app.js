@@ -56,6 +56,10 @@ var ViewModel = function() {
     self.currentPlace(clickedPlace);
 // Maybe separate the below into function
 
+    var windowSize = $(window).width();
+    if (windowSize < 961) {
+      closeSidebar();
+    }
     // Retrieve the place ID from the DOM element
     var markerID = clickedPlace.placeId();
     // Trigger click event on Marker for this list item
@@ -102,6 +106,14 @@ var ViewModel = function() {
     }
 
   });
+
+  document.getElementById('side-menu').addEventListener('click', function() {
+    openSidebar();
+  });
+
+  document.getElementById('close-menu').addEventListener('click', function() {
+    closeSidebar();
+  });
 }
 
 function filterMap(list) {
@@ -118,6 +130,23 @@ function filterMap(list) {
   }
 
   map.fitBounds(bounds);
+}
+
+// Function when called displays the sidebar with user controls
+function openSidebar() {
+  document.getElementById('sidebar').style.display = "flex";
+  document.getElementById('sidebar').style.width = '50%';
+  document.getElementById('sidebar').style.minWidth = '310px';
+  document.getElementById('sidebar').style.maxWidth = '340px';
+  document.getElementById('header').style.display = "none";
+  document.getElementById('map').style.top = "0px";
+}
+
+// Function when called hides the sidebar if screensize is within tablet range
+function closeSidebar() {
+  document.getElementById('sidebar').style.display = "none";
+  document.getElementById('header').style.display = "flex";
+  document.getElementById('map').style.top = "60px";
 }
 
 var map;
@@ -202,6 +231,11 @@ function showRestaurants() {
     bounds.extend(markers[i].position);
   }
   map.fitBounds(bounds);
+
+  var windowSize = $(window).width();
+  if (windowSize < 961) {
+    closeSidebar();
+  }
 }
 
 function populateInfoWindow(marker, infoWindow) {
